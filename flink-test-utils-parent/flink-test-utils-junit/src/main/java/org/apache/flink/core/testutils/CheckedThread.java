@@ -79,6 +79,33 @@ public abstract class CheckedThread extends Thread {
 	}
 
 	/**
+	 * Waits until the thread is completed or the timeout is reached, and checks whether
+	 * any error occurred during the execution.
+	 *
+	 * <p>This method blocks like {@link #join(long)}, but performs an additional check for
+	 * exceptions thrown from the {@link #go()} method.
+	 *
+	 * @param  millis
+	 *         the time to wait in milliseconds
+	 */
+	public void sync(long millis) throws Exception {
+		super.join(millis);
+
+		// propagate the error
+		if (error != null) {
+			if (error instanceof Error) {
+				throw (Error) error;
+			}
+			else if (error instanceof Exception) {
+				throw (Exception) error;
+			}
+			else {
+				throw new Exception(error.getMessage(), error);
+			}
+		}
+	}
+
+	/**
 	 * Waits until the thread is completed and checks whether any error occurred during
 	 * the execution.
 	 *
